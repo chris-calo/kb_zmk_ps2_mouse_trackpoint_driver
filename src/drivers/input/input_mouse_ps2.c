@@ -7,7 +7,6 @@
 #define DT_DRV_COMPAT zmk_input_mouse_ps2
 
 #include <stdlib.h>
-#include <stdio.h>
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
@@ -320,11 +319,11 @@ void zmk_mouse_ps2_activity_toggle_layer();
 // Called by the PS/2 driver whenver the mouse sends a byte and
 // reporting is enabled through `zmk_mouse_ps2_activity_reporting_enable`.
 void zmk_mouse_ps2_activity_callback(const struct device *ps2_device, uint8_t byte) {
-    LOG_DBG("Received mouse movement data: 0x%x", byte);
-
     struct zmk_mouse_ps2_data *data = &zmk_mouse_ps2_data;
 
     k_work_cancel_delayable(&data->packet_buffer_timeout);
+
+    // LOG_DBG("Received mouse movement data: 0x%x", byte);
 
     data->packet_buffer[data->packet_idx] = byte;
 
@@ -336,11 +335,7 @@ void zmk_mouse_ps2_activity_callback(const struct device *ps2_device, uint8_t by
         // again.
         int alignment_bit = MOUSE_PS2_GET_BIT(byte, 3);
         if (alignment_bit != 1) {
-            char str[80];
-
-            snprintf(str, 70, "Bit 3 of packet is 0 instead of 1; received : \"%02X\"", byte);
-            zmk_mouse_ps2_activity_abort_cmd(str);
-
+            zmk_mouse_ps2_activity_abort_cmd("Bit 3 of packet is 0 instead of 1");
             return;
         }
     } else if (data->packet_idx == 1) {
@@ -734,7 +729,6 @@ struct zmk_mouse_ps2_send_cmd_resp zmk_mouse_ps2_send_cmd(char *cmd, int cmd_len
         }
     }
 
-    /*
     if (pause_reporting == true && prev_activity_reporting_on == true) {
         LOG_DBG("Enabling mouse activity reporting...");
 
@@ -748,7 +742,6 @@ struct zmk_mouse_ps2_send_cmd_resp zmk_mouse_ps2_send_cmd(char *cmd, int cmd_len
             }
         }
     }
-    */
 
     return resp;
 }
@@ -764,13 +757,13 @@ int zmk_mouse_ps2_activity_reporting_enable() {
 
     uint8_t cmd = MOUSE_PS2_CMD_ENABLE_REPORTING[0];
     int err = ps2_write(ps2_device, cmd);
-    if (err < 0) {
+    if (err) {
         LOG_ERR("Could not enable data reporting: %d", err);
         return err;
     }
 
     err = ps2_enable_callback(ps2_device);
-    if (err < 0) {
+    if (err) {
         LOG_ERR("Could not enable ps2 callback: %d", err);
         return err;
     }
@@ -980,9 +973,9 @@ int zmk_mouse_ps2_set_packet_mode(zmk_mouse_ps2_packet_mode mode) {
     // Restore sampling rate to prev value
     zmk_mouse_ps2_set_sampling_rate(data->sampling_rate);
 
-    // if (prev_activity_reporting_on == true) {
-        // zmk_mouse_ps2_activity_reporting_enable();
-    // }
+    if (prev_activity_reporting_on == true) {
+        zmk_mouse_ps2_activity_reporting_enable();
+    }
 
     return err;
 }
@@ -1729,13 +1722,13 @@ static void zmk_mouse_ps2_init_thread(int dev_ptr, int unused) {
         return;
     }
 
-    // LOG_INF("Enabling data reporting and ps2 callback...");
-    // err = zmk_mouse_ps2_activity_reporting_enable();
-    // if (err) {
-    //     LOG_ERR("Could not activate ps2 callback: %d", err);
-    // } else {
-    //     LOG_DBG("Successfully activated ps2 callback");
-    // }
+    LOG_INF("Enabling data reporting and ps2 callback...");
+    err = zmk_mouse_ps2_activity_reporting_enable();
+    if (err) {
+        LOG_ERR("Could not activate ps2 callback: %d", err);
+    } else {
+        LOG_DBG("Successfully activated ps2 callback");
+    }
 
     k_work_init_delayable(&data->packet_buffer_timeout, zmk_mouse_ps2_activity_packet_timout);
 
