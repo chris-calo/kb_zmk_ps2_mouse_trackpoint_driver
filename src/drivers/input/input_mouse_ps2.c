@@ -762,13 +762,13 @@ int zmk_mouse_ps2_activity_reporting_enable() {
 
     uint8_t cmd = MOUSE_PS2_CMD_ENABLE_REPORTING[0];
     int err = ps2_write(ps2_device, cmd);
-    if (err) {
+    if (err < 0) {
         LOG_ERR("Could not enable data reporting: %d", err);
         return err;
     }
 
     err = ps2_enable_callback(ps2_device);
-    if (err) {
+    if (err < 0) {
         LOG_ERR("Could not enable ps2 callback: %d", err);
         return err;
     }
