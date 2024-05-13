@@ -320,11 +320,11 @@ void zmk_mouse_ps2_activity_toggle_layer();
 // Called by the PS/2 driver whenver the mouse sends a byte and
 // reporting is enabled through `zmk_mouse_ps2_activity_reporting_enable`.
 void zmk_mouse_ps2_activity_callback(const struct device *ps2_device, uint8_t byte) {
+    LOG_DBG("Received mouse movement data: 0x%x", byte);
+
     struct zmk_mouse_ps2_data *data = &zmk_mouse_ps2_data;
 
     k_work_cancel_delayable(&data->packet_buffer_timeout);
-
-    // LOG_DBG("Received mouse movement data: 0x%x", byte);
 
     data->packet_buffer[data->packet_idx] = byte;
 
