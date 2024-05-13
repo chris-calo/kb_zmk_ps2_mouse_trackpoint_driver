@@ -734,6 +734,7 @@ struct zmk_mouse_ps2_send_cmd_resp zmk_mouse_ps2_send_cmd(char *cmd, int cmd_len
         }
     }
 
+    /*
     if (pause_reporting == true && prev_activity_reporting_on == true) {
         LOG_DBG("Enabling mouse activity reporting...");
 
@@ -747,6 +748,7 @@ struct zmk_mouse_ps2_send_cmd_resp zmk_mouse_ps2_send_cmd(char *cmd, int cmd_len
             }
         }
     }
+    */
 
     return resp;
 }
@@ -978,9 +980,9 @@ int zmk_mouse_ps2_set_packet_mode(zmk_mouse_ps2_packet_mode mode) {
     // Restore sampling rate to prev value
     zmk_mouse_ps2_set_sampling_rate(data->sampling_rate);
 
-    if (prev_activity_reporting_on == true) {
-        zmk_mouse_ps2_activity_reporting_enable();
-    }
+    // if (prev_activity_reporting_on == true) {
+        // zmk_mouse_ps2_activity_reporting_enable();
+    // }
 
     return err;
 }
@@ -1727,13 +1729,13 @@ static void zmk_mouse_ps2_init_thread(int dev_ptr, int unused) {
         return;
     }
 
-    LOG_INF("Enabling data reporting and ps2 callback...");
-    err = zmk_mouse_ps2_activity_reporting_enable();
-    if (err) {
-        LOG_ERR("Could not activate ps2 callback: %d", err);
-    } else {
-        LOG_DBG("Successfully activated ps2 callback");
-    }
+    // LOG_INF("Enabling data reporting and ps2 callback...");
+    // err = zmk_mouse_ps2_activity_reporting_enable();
+    // if (err) {
+    //     LOG_ERR("Could not activate ps2 callback: %d", err);
+    // } else {
+    //     LOG_DBG("Successfully activated ps2 callback");
+    // }
 
     k_work_init_delayable(&data->packet_buffer_timeout, zmk_mouse_ps2_activity_packet_timout);
 
