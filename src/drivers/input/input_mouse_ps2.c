@@ -7,6 +7,7 @@
 #define DT_DRV_COMPAT zmk_input_mouse_ps2
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
@@ -335,8 +336,11 @@ void zmk_mouse_ps2_activity_callback(const struct device *ps2_device, uint8_t by
         // again.
         int alignment_bit = MOUSE_PS2_GET_BIT(byte, 3);
         if (alignment_bit != 1) {
+            char str[80];
 
-            zmk_mouse_ps2_activity_abort_cmd("Bit 3 of packet is 0 instead of 1");
+            snprintf(str, 70, "Bit 3 of packet is 0 instead of 1; received : \"%02X\"", byte);
+            zmk_mouse_ps2_activity_abort_cmd(str);
+
             return;
         }
     } else if (data->packet_idx == 1) {
