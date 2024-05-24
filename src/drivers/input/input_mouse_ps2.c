@@ -847,7 +847,7 @@ int zmk_mouse_ps2_array_get_prev_elem(int elem, int *array, size_t array_size) {
 void buffer_to_hex_string(const uint8_t *buffer, size_t buffer_size, char *hex_string) {
   for (size_t i = 0; i < buffer_size; i++) {
     sprintf(&hex_string[i * 2], "%02X", buffer[i]);
-}
+  }
 
   hex_string[buffer_size * 2] = '\0';
 }
@@ -869,10 +869,10 @@ int zmk_mouse_ps2_reset(const struct device *ps2_device) {
     buffer_to_hex_string(resp.resp_buffer, 8, hex_string);
     strcat(base_string, hex_string);
     strcat(base_string, "\"");
-    LOG_DBG(base_string);
+    LOG_DBG("%s", base_string);
 
     if (resp.err) {
-        LOG_ERR("Could not send reset cmd");
+      LOG_ERR("Could not send reset cmd");
     }
 
     return resp.err;
