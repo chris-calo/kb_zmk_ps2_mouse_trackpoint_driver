@@ -25,7 +25,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
  */
 
 // Delay mouse init to give the mouse time to send the init sequence.
-#define ZMK_MOUSE_PS2_INIT_THREAD_DELAY_MS 1000
+#define ZMK_MOUSE_PS2_INIT_THREAD_DELAY_MS 2000
 
 // How often the driver try to initialize a mouse before we give up.
 #define MOUSE_PS2_INIT_ATTEMPTS 10
@@ -323,7 +323,7 @@ void zmk_mouse_ps2_activity_callback(const struct device *ps2_device, uint8_t by
 
     k_work_cancel_delayable(&data->packet_buffer_timeout);
 
-    // LOG_DBG("Received mouse movement data: 0x%x", byte);
+    LOG_DBG("Received mouse movement data: 0x%x", byte);
 
     data->packet_buffer[data->packet_idx] = byte;
 
@@ -844,6 +844,15 @@ int zmk_mouse_ps2_array_get_prev_elem(int elem, int *array, size_t array_size) {
     return array[prev_index];
 }
 
+void buffer_to_hex_string(const uint8_t *buffer, size_t buffer_size, char *hex_string) {
+  for (size_t i = 0; i < buffer_size; i++) {
+    sprintf(&hex_string[i * 2], "%02X", buffer[i]);
+}
+
+  hex_string[buffer_size * 2] = '\0';
+}
+
+
 /*
  * PS/2 Commands
  */
@@ -852,6 +861,16 @@ int zmk_mouse_ps2_reset(const struct device *ps2_device) {
     struct zmk_mouse_ps2_send_cmd_resp resp =
         zmk_mouse_ps2_send_cmd(MOUSE_PS2_CMD_RESET, sizeof(MOUSE_PS2_CMD_RESET), NULL,
                                MOUSE_PS2_CMD_RESET_RESP_LEN, false);
+
+    
+    char base_string[100] = "[zmk_mouse_ps2_reset] resp.resp_buffer : \"";
+    char hex_string[17];
+
+    buffer_to_hex_string(resp.resp_buffer, 8, hex_string);
+    strcat(base_string, hex_string);
+    strcat(base_string, "\"");
+    LOG_DBG(base_string);
+
     if (resp.err) {
         LOG_ERR("Could not send reset cmd");
     }
@@ -1803,7 +1822,6 @@ int zmk_mouse_ps2_init_wait_for_mouse(const struct device *dev) {
 
         err = ps2_read(config->ps2_device, &read_val);
         if (err == 0) {
-            /*
             if (read_val != MOUSE_PS2_RESP_SELF_TEST_PASS) {
                 LOG_WRN("Got invalid PS/2 self-test result: 0x%x", read_val);
 
@@ -1812,7 +1830,6 @@ int zmk_mouse_ps2_init_wait_for_mouse(const struct device *dev) {
 
                 continue;
             }
-            */
 
             LOG_INF("PS/2 Device passed self-test: 0x%x", read_val);
 
