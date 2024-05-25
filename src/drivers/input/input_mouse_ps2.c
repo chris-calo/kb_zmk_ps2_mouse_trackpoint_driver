@@ -1812,6 +1812,7 @@ int zmk_mouse_ps2_init_wait_for_mouse(const struct device *dev) {
     const struct zmk_mouse_ps2_config *config = dev->config;
     int err;
 
+    static bool cycled = false;
     uint8_t read_val;
 
     for (int i = 0; i < MOUSE_PS2_INIT_ATTEMPTS; i++) {
@@ -1823,12 +1824,13 @@ int zmk_mouse_ps2_init_wait_for_mouse(const struct device *dev) {
 
         err = ps2_read(config->ps2_device, &read_val);
         if (err == 0) {
-            if (read_val != MOUSE_PS2_RESP_SELF_TEST_PASS) {
+            if (read_val != MOUSE_PS2_RESP_SELF_TEST_PASS || !cycled) {
                 LOG_WRN("Got invalid PS/2 self-test result: 0x%x", read_val);
 
                 LOG_INF("Trying to reset PS2 device...");
                 zmk_mouse_ps2_reset(config->ps2_device);
 
+                cycled = true;
                 continue;
             }
 
