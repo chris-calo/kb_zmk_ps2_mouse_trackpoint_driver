@@ -80,7 +80,7 @@ PINCTRL_DT_DEFINE(DT_INST_BUS(0));
 // Theoretically, only 100us is required, but practically, trackponts
 // seem to respond to a total duration of 1,000 us the best.
 // This is also the duration my USB to PS/2 adapter is using.
-#define PS2_UART_TIMING_SCL_INHIBITION (5 * PS2_UART_TIMING_SCL_INHIBITION_MIN)
+#define PS2_UART_TIMING_SCL_INHIBITION (10 * PS2_UART_TIMING_SCL_INHIBITION_MIN)
 
 // PS2 uses a frequency between 10 kHz and 16.7 kHz. So clocks should arrive
 // within 60-100us.
@@ -98,7 +98,7 @@ PINCTRL_DT_DEFINE(DT_INST_BUS(0));
 // Even though PS/2 devices send the clock at most every 100us, it doesn't mean
 // that the interrupts always get triggered within that time. So we allow a
 // little extra time.
-#define PS2_UART_TIMEOUT_WRITE_SCL K_USEC(PS2_UART_TIMING_SCL_CYCLE_MAX + 50)
+#define PS2_UART_TIMEOUT_WRITE_SCL K_USEC(PS2_UART_TIMING_SCL_CYCLE_MAX + 150)
 
 // Writes start with us inhibiting the line and then respond
 // with 11 bits (start bit included in inhibition time).
@@ -115,7 +115,7 @@ PINCTRL_DT_DEFINE(DT_INST_BUS(0));
 // PS/2 spec says that device must respond within 20msec,
 // but real life devices take much longer. Especially if
 // you interrupt existing transmissions.
-#define PS2_UART_TIMEOUT_WRITE_AWAIT_RESPONSE K_MSEC(300)
+#define PS2_UART_TIMEOUT_WRITE_AWAIT_RESPONSE K_MSEC(500)
 
 /*
  * Driver Defines
