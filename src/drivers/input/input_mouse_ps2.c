@@ -323,7 +323,7 @@ void zmk_mouse_ps2_activity_callback(const struct device *ps2_device, uint8_t by
 
     k_work_cancel_delayable(&data->packet_buffer_timeout);
 
-    LOG_DBG("Received mouse movement data: 0x%x", byte);
+    LOG_INF("Received mouse movement data: 0x%x", byte);
 
     data->packet_buffer[data->packet_idx] = byte;
 
@@ -869,7 +869,7 @@ int zmk_mouse_ps2_reset(const struct device *ps2_device) {
     buffer_to_hex_string(resp.resp_buffer, 8, hex_string);
     strcat(base_string, hex_string);
     strcat(base_string, "\"");
-    LOG_DBG("%s", base_string);
+    LOG_INF("%s", base_string);
 
     if (resp.err) {
       LOG_ERR("Could not send reset cmd");
