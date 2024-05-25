@@ -337,7 +337,7 @@ void zmk_mouse_ps2_activity_callback(const struct device *ps2_device, uint8_t by
         int alignment_bit = MOUSE_PS2_GET_BIT(byte, 3);
         if (alignment_bit != 1) {
             zmk_mouse_ps2_activity_abort_cmd("Bit 3 of packet is 0 instead of 1");
-            return;
+            // return;
         }
     } else if (data->packet_idx == 1) {
         // Do nothing
