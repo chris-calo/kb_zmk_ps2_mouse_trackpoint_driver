@@ -92,13 +92,13 @@ PINCTRL_DT_DEFINE(DT_INST_BUS(0));
 // need much longer if you are asking them to interrupt an
 // ongoing read.
 #define PS2_UART_TIMING_SCL_INHIBITION_RESP_MAX 3000
-#define PS2_UART_TIMEOUT_WRITE_SCL_START K_USEC(PS2_UART_TIMING_SCL_INHIBITION_RESP_MAX * 20)
+#define PS2_UART_TIMEOUT_WRITE_SCL_START K_USEC(PS2_UART_TIMING_SCL_INHIBITION_RESP_MAX)
 
 // Max time we allow the device to send the next clock signal during writes.
 // Even though PS/2 devices send the clock at most every 100us, it doesn't mean
 // that the interrupts always get triggered within that time. So we allow a
 // little extra time.
-#define PS2_UART_TIMEOUT_WRITE_SCL K_USEC(PS2_UART_TIMING_SCL_CYCLE_MAX + 500)
+#define PS2_UART_TIMEOUT_WRITE_SCL K_USEC(PS2_UART_TIMING_SCL_CYCLE_MAX + 50)
 
 // Writes start with us inhibiting the line and then respond
 // with 11 bits (start bit included in inhibition time).
